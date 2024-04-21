@@ -1,0 +1,5 @@
+# main git ignore files
+
+/ooad/src/main/resources/application.properties
+
+.hintrc

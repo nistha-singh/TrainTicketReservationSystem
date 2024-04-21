@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- Base for all html pages -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+    <title>Book On Rails</title>
+</head>
+
+<body>
+    <header th:insert="~{base :: header}"></header>
+
+    <div class="content-body container-fluid">
+        <div class="container mt-5">
+            <!-- Add content here -->
+            <h1 class="text-muted" th:text="${message}">Current tickets:</h1>
+            <p class="text-danger" th:if="${param.error}" th:text="${param.error}"></p>
+
+            <div th:each="ticket : ${tickets}" class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4 class="card-title mb-2" th:text="${ticket.train.trainName}">Sbc Tlgp Exp</h4> 
+                            <span class="text-danger h5" th:text="${ticket.status}"></span>
+                            <p class="card-text mb-0" th:text="'Train No: #' + ${ticket.train.trainNo}">Train No :#45678
+                            </p>
+                            <p class="card-text mb-0" th:text="'PNR: ' + ${ticket.PNR}">PNR: 1234567890</p>
+                            <p class="card-text mb-0" th:text="'Class: ' + ${ticket.classes}">Class: 2A</p>
+                            <p class="card-text mb-0" th:text="'Date of Journey: ' + ${ticket.date}">Date of Journey :
+                                12/12/2021</p>
+                            <p class="card-text mb-0" th:text="'Number Of Passengers: ' + ${ticket.passengers.size()}">
+                                Number Of Passengers : 5</p>
+                            <p class="card-text mb-0" th:text="'Total Fare: ' + ${ticket.calculateFinalPrice()}">Total
+                                Fare: 2500.00</p>
+
+                        </div>
+                        <div class="col-6 text-justify">
+                            <p class="card-text mb-0">
+                            <form action="/ticket/view-ticket" method="get">
+                                <input type="hidden" name="ticketId" th:value="${ticket.id}">
+                                <button style="width:100%;" type="submit" class="btn btn-warning">View Ticket
+                                </button>
+                            </form>
+                            <div th:if="${ticket.status.toString().equals('Confirmed') && ticket.date.after(#dates.createToday())} ">
+
+                                <form action="/ticket/cancel-ticket" method="get">
+                                    <input type="hidden" name="ticketId" th:value="${ticket.id}">
+                                    <button style="width:100%;" type="submit" class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to cancel this ticket?')">Cancel
+                                        Ticket
+                                    </button>
+                                </form>
+                            </div>
+                            <!-- Add Feedback button if journey date is in the past -->
+                            <!-- <div th:if="${#dates.past(ticket.date)}"> -->
+                            <div th:if="${ticket.date.before(#dates.createToday())}">
+                                <form action="/feedback/give-feedback" method="get">
+                                    <input type="hidden" name="ticketId" th:value="${ticket.id}">
+                                    <button style="width:100%;" type="submit" class="btn btn-primary mt-3">Give
+                                        Feedback</button>
+                                </form>
+                            </div>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <p class="mb-0"
+                                        th:text="${ticket.train.route.getDepartureTimeByStation(ticket.SRC)}">
+                                        <strong>3:12 PM, Thu</strong></p>
+                                    <p class="mb-0" th:text="${ticket.SRC} ">Yesvantpur Jn (YPR)</p>
+                                </div>
+                                <div>
+                                    <span class="mb-0">---------</span>
+                                    <span class="mb-0"
+                                        th:text="${ticket.train.route.calculateJourneyTime(ticket.SRC,ticket.DEST)}">4hrs
+                                        2mins</span>
+                                    <span class="mb-0">---------&gt;</span>
+                                </div>
+                                <div>
+                                    <p class="mb-0"
+                                        th:text="${ticket.train.route.getArrivalTimeByStation(ticket.DEST)}">
+                                        <strong>7:14 PM, Thu</strong></p>
+                                    <p class="mb-0" th:text="${ticket.DEST} ">Shivamogga H (SME)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/user.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
